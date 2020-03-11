@@ -38,7 +38,10 @@ float slider = 0.0f;
 bool recording = false;
 GLuint vao = -1;
 vec3 lightPos(0, 1.5, 0);
-
+vec3 camPos(0.0f, 2.0f, 1.5f);
+extern float hMax;
+extern float hMin;
+bool useLight = false;
 //Draw the user interface using ImGui
 void draw_gui()
 {
@@ -72,6 +75,8 @@ void draw_gui()
    //create a slider to change the angle variables
    ImGui::SliderFloat("View angle", &slider, -3.141592f, +3.141592f);
    ImGui::SliderFloat3("LightPos", &lightPos[0], 0.0f, 3.0f);
+   ImGui::SliderFloat3("CameraPos", &camPos[0], 0.0f, 4.0f);
+   ImGui::Checkbox("UseLight", &useLight);
    ImGui::Render();
  }
 
@@ -88,7 +93,7 @@ void display()
    const float aspect_ratio = float(w) / float(h);
 
    glm::mat4 M = glm::rotate(slider, glm::vec3(0.0f, 1.0f, 0.0f));
-   glm::mat4 V = glm::lookAt(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+   glm::mat4 V = glm::lookAt(camPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
    glm::mat4 P = glm::perspective(radians(60.f), aspect_ratio, 0.1f, 100.0f);
 
    int light_loc = glGetUniformLocation(shader_program, "light");
@@ -106,7 +111,18 @@ void display()
    {
 	   glUniformMatrix4fv(M_loc, 1, false, glm::value_ptr(M));
    }
-
+   int hMin_loc = glGetUniformLocation(shader_program, "hMin");
+   if (hMin_loc) {
+	   glUniform1f(hMin_loc, hMin);
+   }
+   int hMax_loc = glGetUniformLocation(shader_program, "hMax");
+   if (hMax_loc) {
+	   glUniform1f(hMax_loc, hMax);
+   }
+   int useLight_loc = glGetUniformLocation(shader_program, "useLight");
+   if (useLight_loc) {
+	   glUniform1f(useLight_loc, useLight);
+   }
    DrawTerrain(vao);
          
    draw_gui();
@@ -176,7 +192,7 @@ void initOpenGl()
 
    reload_shader();
 
-   vao = create_voronoi_vao();
+   vao = create_terrain_vao();
 
 }
 
@@ -193,7 +209,7 @@ void keyboard(unsigned char key, int x, int y)
          reload_shader();     
       break;
 	  case 32:
-		  vao = create_voronoi_vao();
+		  vao = create_terrain_vao();
 		  break;
    }
 }

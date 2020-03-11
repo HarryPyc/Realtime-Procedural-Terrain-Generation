@@ -1,7 +1,6 @@
 #include "GenerateTerrain.h"
 
 int N;
-
 GLuint create_surf_vbo() {
 	vector<vec3> v;
 	Surf *surf = new Surf(width, initialSpread);
@@ -55,10 +54,10 @@ GLuint create_surf_vao() {
 	glBindVertexArray(0);
 	return vao;
 }
-int vN;
+
 GLuint create_voronoi_vbo() {
 	Voronoi *vor = new Voronoi(iterationTimes, randomPointsNum, -1.0f, 1.0f);
-	vN = vor->N;
+	N = vor->N;
 	GLuint vbo = -1;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -68,10 +67,10 @@ GLuint create_voronoi_vbo() {
 }
 GLuint create_voronoi_ebo() {
 	vector<unsigned int> indices;
-	for (int i = 0; i < vN - 1; i++) {
-		for (int j = 0; j < vN; j++) {
-			indices.push_back(j + i*vN);
-			indices.push_back(j + (i + 1)*vN);
+	for (int i = 0; i < N - 1; i++) {
+		for (int j = 0; j < N; j++) {
+			indices.push_back(j + i*N);
+			indices.push_back(j + (i + 1)*N);
 		}
 		indices.push_back(RESTART);
 	}
@@ -98,9 +97,100 @@ GLuint create_voronoi_vao() {
 	glBindVertexArray(0);
 	return vao;
 }
+
+float hMax = -999.f;
+float hMin = 999.f;
+GLuint create_terrain_vbo() {
+	Voronoi *vor = new Voronoi(iterationTimes, randomPointsNum, -1.0f, 1.0f);
+	Surf *surf = new Surf(width, initialSpread);
+	for (int i = 0; i < iterationTimes; i++)
+		surf = surf->MidpointDisplacement();
+	N = vor->N;
+	vector<vec3> v;
+	for (int i = 0; i < N*N; i++)
+		v.push_back(surf->points[i]->p);
+	sort(v.begin(), v.end(), compZ);
+	vector<vec3>::iterator it = v.begin();
+	for (int i = 0; i < N; i++) {
+		sort(it, it + N, compX);
+		it = it + N;
+	}
+	for (int i = 0; i < N*N; i++) {
+		v[i].y = (v[i].y*2.f + vor->v[i].y*1.f) / 3.f;
+		hMin = v[i].y < hMin ? v[i].y : hMin;
+		hMax = v[i].y > hMax ? v[i].y : hMax;
+	}
+	vector<vec3> normal;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			vec3 left, right, up, down;
+			if (i == 0) up = v[i];
+			else if (i == N - 1) down = v[i];
+			else {
+				up = v[(i - 1)*N + j];
+				down = v[(i + 1)*N + j];
+			}
+			if (j == 0) left = v[i];
+			else if (j == N - 1) right = v[i];
+			else {
+				left = v[i*N + j + 1];
+				right = v[i*N + j - 1];
+			}
+			vec3 n = normalize(cross(up - down, right - left));
+			normal.push_back(n);
+		}
+	}
+	v.insert(v.end(), normal.begin(), normal.end());
+	GLuint vbo = -1;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, v.size() * sizeof(vec3), &v[0], GL_STATIC_DRAW);
+
+	return vbo;
+}
+GLuint create_terrain_ebo() {
+	vector<unsigned int> indices;
+	for (int i = 0; i < N - 1; i++) {
+		for (int j = 0; j < N; j++) {
+			indices.push_back(j + i * N);
+			indices.push_back(j + (i + 1)*N);
+		}
+		indices.push_back(RESTART);
+	}
+	GLuint ebo = -1;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	glPrimitiveRestartIndex(RESTART);
+	return ebo;
+}
+GLuint create_terrain_vao() {
+	GLuint vao = -1;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	GLuint vbo = create_terrain_vbo();
+	GLuint ebo = create_terrain_ebo();
+
+	const GLuint pos_loc = 0;
+	const GLuint normal_loc = 1;
+	glEnableVertexAttribArray(pos_loc);
+	glEnableVertexAttribArray(normal_loc);
+	glVertexAttribPointer(pos_loc, 3, GL_FLOAT, false, 0, 0);
+	glVertexAttribPointer(normal_loc, 3, GL_FLOAT, false, 0, (void*)(N*N*3*sizeof(float)));
+	glBindVertexArray(0);
+	return vao;
+}
 void DrawTerrain(GLuint vao) {
 	glBindVertexArray(vao);
 	//glDrawArrays(GL_TRIANGLES, 0, N);
-	
-	glDrawElements(GL_TRIANGLE_STRIP, 2*vN*vN + vN-1, GL_UNSIGNED_INT, 0);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glDrawElements(GL_TRIANGLE_STRIP, 2*N*N + N-1, GL_UNSIGNED_INT, 0);
+}
+
+bool compZ(const vec3 &a, const vec3 &b) {
+		return  FLT_EPSILON< b.z - a.z;
+}
+bool compX(const vec3 &a, const vec3 &b) {
+	return FLT_EPSILON < b.x - a.x;
 }
