@@ -15,5 +15,5 @@ GLuint create_surf_vao();
 GLuint create_voronoi_vao();
 GLuint create_terrain_vao();
 void DrawTerrain(GLuint vao);
-bool compZ(const vec3 &a, const vec3 &b);
-bool compX(const vec3 &a, const vec3 &b);
+
+bool comp(const vec3 &a, const vec3 &b);

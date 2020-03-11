@@ -109,12 +109,7 @@ GLuint create_terrain_vbo() {
 	vector<vec3> v;
 	for (int i = 0; i < N*N; i++)
 		v.push_back(surf->points[i]->p);
-	sort(v.begin(), v.end(), compZ);
-	vector<vec3>::iterator it = v.begin();
-	for (int i = 0; i < N; i++) {
-		sort(it, it + N, compX);
-		it = it + N;
-	}
+	sort(v.begin(), v.end(), comp);
 	for (int i = 0; i < N*N; i++) {
 		v[i].y = (v[i].y*2.f + vor->v[i].y*1.f) / 3.f;
 		hMin = v[i].y < hMin ? v[i].y : hMin;
@@ -124,19 +119,12 @@ GLuint create_terrain_vbo() {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			vec3 left, right, up, down;
-			if (i == 0) up = v[i];
-			else if (i == N - 1) down = v[i];
-			else {
-				up = v[(i - 1)*N + j];
-				down = v[(i + 1)*N + j];
-			}
-			if (j == 0) left = v[i];
-			else if (j == N - 1) right = v[i];
-			else {
-				left = v[i*N + j + 1];
-				right = v[i*N + j - 1];
-			}
-			vec3 n = normalize(cross(up - down, right - left));
+			up = i == 0 ? v[j] : v[(i - 1)*N + j];
+			down = i == N - 1 ? v[i*N + j] : v[(i + 1)*N + j];
+			left = j == 0 ? v[i*N] : v[i*N + j - 1];
+			right = j == N - 1 ? v[i*N + j] : v[i*N + j + 1];
+
+			vec3 n = normalize(cross(right - left, up - down));
 			normal.push_back(n);
 		}
 	}
@@ -188,9 +176,9 @@ void DrawTerrain(GLuint vao) {
 	glDrawElements(GL_TRIANGLE_STRIP, 2*N*N + N-1, GL_UNSIGNED_INT, 0);
 }
 
-bool compZ(const vec3 &a, const vec3 &b) {
-		return  FLT_EPSILON< b.z - a.z;
-}
-bool compX(const vec3 &a, const vec3 &b) {
-	return FLT_EPSILON < b.x - a.x;
+
+bool comp(const vec3 &a, const vec3 &b) {
+	float A = a.x + a.z*100.f;
+	float B = b.x + b.z*100.f;
+	return A < B;
 }

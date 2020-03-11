@@ -15,7 +15,7 @@ void main(void)
 		vec3 l = light - p;
 		float dist = length(l);
 		l = normalize(l);
-		float light = Ka + Kd * dot(l, n) / (dist*dist);
+		float light = Ka + Kd * max(dot(l, n), 0) / (dist*dist);
 		fragcolor = vec4(light*color, 1.0);
 	}
 	else {

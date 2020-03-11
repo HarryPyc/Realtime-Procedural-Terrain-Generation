@@ -26,11 +26,6 @@ static const std::string vertex_shader("template_vs.glsl");
 static const std::string fragment_shader("template_fs.glsl");
 
 GLuint shader_program = -1;
-GLuint texture_id = -1; //Texture map for fish
-
-//names of the mesh and texture files to load
-static const std::string mesh_name = "Amago0.obj";
-static const std::string texture_name = "AmagoT.bmp";
 
 MeshData mesh_data;
 float time_sec = 0.0f;
@@ -74,8 +69,8 @@ void draw_gui()
 
    //create a slider to change the angle variables
    ImGui::SliderFloat("View angle", &slider, -3.141592f, +3.141592f);
-   ImGui::SliderFloat3("LightPos", &lightPos[0], 0.0f, 3.0f);
-   ImGui::SliderFloat3("CameraPos", &camPos[0], 0.0f, 4.0f);
+   ImGui::SliderFloat3("LightPos", &lightPos[0],-3.0f, 3.0f);
+   ImGui::SliderFloat3("CameraPos", &camPos[0], -4.0f, 4.0f);
    ImGui::Checkbox("UseLight", &useLight);
    ImGui::Render();
  }
