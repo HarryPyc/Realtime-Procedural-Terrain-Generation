@@ -144,10 +144,7 @@ Surf::Surf()
 Surf::~Surf()
 {
 }
-inline float random11() {
-	float r = 2.f*rand() / (float)RAND_MAX - 1.f ;
-	return r / 2.f;
-}
+
 inline vec3 offset(float spread) {
 	return random11() * spread * vec3(0, 1, 0);
 }

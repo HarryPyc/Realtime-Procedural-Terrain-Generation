@@ -159,6 +159,7 @@
     <ClCompile Include="LoadTexture.cpp" />
     <ClCompile Include="Surf.cpp" />
     <ClCompile Include="VideoMux.cpp" />
+    <ClCompile Include="Voronoi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="template_fs.glsl" />
@@ -177,8 +178,10 @@
     <ClInclude Include="InitShader.h" />
     <ClInclude Include="LoadMesh.h" />
     <ClInclude Include="LoadTexture.h" />
+    <ClInclude Include="Mathfunc.h" />
     <ClInclude Include="Surf.h" />
     <ClInclude Include="VideoMux.h" />
+    <ClInclude Include="Voronoi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

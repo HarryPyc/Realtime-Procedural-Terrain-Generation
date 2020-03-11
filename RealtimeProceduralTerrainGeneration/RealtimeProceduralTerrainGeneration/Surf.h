@@ -1,8 +1,5 @@
 #pragma once
-#include <glm\glm.hpp>
-#include <vector>
-using namespace glm;
-using namespace std;
+#include "Mathfunc.h"
 
 class Square;
 class Edge;
@@ -56,5 +53,5 @@ public:
 	void CalculateNormal();
 };
 
-inline float random11();
+
 inline vec3 offset(float spread);

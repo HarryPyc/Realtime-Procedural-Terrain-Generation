@@ -36,7 +36,7 @@ MeshData mesh_data;
 float time_sec = 0.0f;
 float slider = 0.0f;
 bool recording = false;
-GLuint surf_vao = -1;
+GLuint vao = -1;
 vec3 lightPos(0, 1.5, 0);
 
 //Draw the user interface using ImGui
@@ -88,7 +88,7 @@ void display()
    const float aspect_ratio = float(w) / float(h);
 
    glm::mat4 M = glm::rotate(slider, glm::vec3(0.0f, 1.0f, 0.0f));
-   glm::mat4 V = glm::lookAt(glm::vec3(0.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+   glm::mat4 V = glm::lookAt(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
    glm::mat4 P = glm::perspective(radians(60.f), aspect_ratio, 0.1f, 100.0f);
 
    int light_loc = glGetUniformLocation(shader_program, "light");
@@ -107,7 +107,7 @@ void display()
 	   glUniformMatrix4fv(M_loc, 1, false, glm::value_ptr(M));
    }
 
-   DrawTerrain(surf_vao);
+   DrawTerrain(vao);
          
    draw_gui();
 
@@ -171,11 +171,12 @@ void initOpenGl()
    glewInit();
    RegisterCallback();
    glEnable(GL_DEPTH_TEST);
-   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+   glEnable(GL_PRIMITIVE_RESTART);
 
    reload_shader();
 
-   surf_vao = create_surf_vao();
+   vao = create_voronoi_vao();
 
 }
 
@@ -192,7 +193,7 @@ void keyboard(unsigned char key, int x, int y)
          reload_shader();     
       break;
 	  case 32:
-		  surf_vao = create_surf_vao();
+		  vao = create_voronoi_vao();
 		  break;
    }
 }
