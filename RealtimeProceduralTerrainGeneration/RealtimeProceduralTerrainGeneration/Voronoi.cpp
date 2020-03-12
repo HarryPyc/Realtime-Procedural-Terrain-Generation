@@ -13,19 +13,20 @@ void Voronoi::GetD1D2(vec3 p)
 	d2 = dist[1];
 }
 
-Voronoi::Voronoi(int times, int rNum, float c1, float c2) {
+Voronoi::Voronoi(int times, int rNum, float c1, float c2, float width) {
 	this->c1 = c1;
 	this->c2 = c2;
+	float w = width / 2.f;
 	for (int i = 0; i < rNum; i++) {
-		vec3 r(random11(), 0.f, random11());
+		vec3 r(random11()*w, 0.f, random11()*w);
 		rpoints.push_back(r);
 	}
 	N = pow(2, times) + 1;
-	float offset = 2.f / (N - 1);
+	float offset = width / (N - 1);
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
-			float x = j * offset - 1.0f;
-			float z = i * offset - 1.0f;
+			float x = j * offset - w;
+			float z = i * offset - w;
 			vec3 p(x, 0.f, z);
 			GetD1D2(p);
 			p.y = c1 * d1 + c2 * d2;

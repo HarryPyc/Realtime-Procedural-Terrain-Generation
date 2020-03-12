@@ -10,7 +10,7 @@ public:
 	float c1, c2;
 	float d1, d2;
 	void GetD1D2(vec3 p);
-	Voronoi(int times, int rNum, float c1, float c2);
+	Voronoi(int times, int rNum, float c1, float c2, float width);
 	Voronoi();
 	~Voronoi();
 };

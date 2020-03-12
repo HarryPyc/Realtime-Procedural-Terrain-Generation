@@ -26,8 +26,16 @@ static const std::string vertex_shader("template_vs.glsl");
 static const std::string fragment_shader("template_fs.glsl");
 
 GLuint shader_program = -1;
+static const std::string texGrass_name = "textures/T_Ground_Grass_1_BC_R.tga";
+static const std::string texRock_name = "textures/T_Ground_Rock_2_BC_R.tga";
+static const std::string texRock2_name = "textures/T_Ground_Rock_5_BC_R.tga";
+static const std::string texSnow_name = "textures/T_Ground_Snow_1_BC_R.tga";
 
-MeshData mesh_data;
+GLuint texGrass = -1;
+GLuint texRock = -1;
+GLuint texRock2 = -1; 
+GLuint texSnow = -1;
+
 float time_sec = 0.0f;
 float slider = 0.0f;
 bool recording = false;
@@ -90,6 +98,35 @@ void display()
    glm::mat4 M = glm::rotate(slider, glm::vec3(0.0f, 1.0f, 0.0f));
    glm::mat4 V = glm::lookAt(camPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
    glm::mat4 P = glm::perspective(radians(60.f), aspect_ratio, 0.1f, 100.0f);
+
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, texGrass);
+   glActiveTexture(GL_TEXTURE1);
+   glBindTexture(GL_TEXTURE_2D, texRock);
+   glActiveTexture(GL_TEXTURE2);
+   glBindTexture(GL_TEXTURE_2D, texRock2);
+   glActiveTexture(GL_TEXTURE3);
+   glBindTexture(GL_TEXTURE_2D, texSnow);
+   int texGrass_loc = glGetUniformLocation(shader_program, "grass");
+   if (texGrass_loc != -1)
+   {
+	   glUniform1i(texGrass_loc, 0); // we bound our texture to texture unit 0
+   }
+   int texRock_loc = glGetUniformLocation(shader_program, "rock");
+   if (texRock_loc != -1)
+   {
+	   glUniform1i(texRock_loc, 1); // we bound our texture to texture unit 0
+   }
+   int texRock2_loc = glGetUniformLocation(shader_program, "rock2");
+   if (texRock2_loc != -1)
+   {
+	   glUniform1i(texRock2_loc, 2); // we bound our texture to texture unit 0
+   }
+   int texSnow_loc = glGetUniformLocation(shader_program, "snow");
+   if (texSnow_loc != -1)
+   {
+	   glUniform1i(texSnow_loc, 3); // we bound our texture to texture unit 0
+   }
 
    int light_loc = glGetUniformLocation(shader_program, "light");
    if (light_loc != -1) {
@@ -186,8 +223,13 @@ void initOpenGl()
    glEnable(GL_PRIMITIVE_RESTART);
 
    reload_shader();
+   texGrass = LoadTexture(texGrass_name.c_str());
+   texRock = LoadTexture(texRock_name.c_str());
+   texRock2 = LoadTexture(texRock2_name.c_str());
+   texSnow = LoadTexture(texSnow_name.c_str());
 
    vao = create_terrain_vao();
+
 
 }
 

@@ -3,12 +3,15 @@
 #include <GL/gl.h>
 #include "Surf.h"
 #include "Voronoi.h"
+#include <glm/gtc/random.hpp>
+
 #define RESTART 99999
 
 const int iterationTimes = 6;
-const float width = 2.0f;
-const float initialSpread = 0.5f;
+const float width = 4.0f;
+const float initialSpread = 1.0f;
 const int randomPointsNum = 20;
+const float magnitude = 0.25f;
 
 
 GLuint create_surf_vao();

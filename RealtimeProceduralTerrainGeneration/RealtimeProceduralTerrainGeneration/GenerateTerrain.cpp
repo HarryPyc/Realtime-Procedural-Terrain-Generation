@@ -40,7 +40,7 @@ GLuint create_surf_vbo() {
 GLuint create_surf_vao() {
 	GLuint vao = -1;
 	GLuint vbo = create_surf_vbo();
-
+	
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	const GLuint pos_loc = 0;
@@ -56,7 +56,7 @@ GLuint create_surf_vao() {
 }
 
 GLuint create_voronoi_vbo() {
-	Voronoi *vor = new Voronoi(iterationTimes, randomPointsNum, -1.0f, 1.0f);
+	Voronoi *vor = new Voronoi(iterationTimes, randomPointsNum, -1.0f, 1.0f, width);
 	N = vor->N;
 	GLuint vbo = -1;
 	glGenBuffers(1, &vbo);
@@ -101,7 +101,7 @@ GLuint create_voronoi_vao() {
 float hMax = -999.f;
 float hMin = 999.f;
 GLuint create_terrain_vbo() {
-	Voronoi *vor = new Voronoi(iterationTimes, randomPointsNum, -1.0f, 1.0f);
+	Voronoi *vor = new Voronoi(iterationTimes, randomPointsNum, -1.0f, 1.0f, width);
 	Surf *surf = new Surf(width, initialSpread);
 	for (int i = 0; i < iterationTimes; i++)
 		surf = surf->MidpointDisplacement();
@@ -115,7 +115,25 @@ GLuint create_terrain_vbo() {
 		hMin = v[i].y < hMin ? v[i].y : hMin;
 		hMax = v[i].y > hMax ? v[i].y : hMax;
 	}
+
+	/*vector<vec3> t;
+	float offset = width / (N - 1);
+	float w = width / 2.f;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			int _i = gaussRand(float(i), 1.f);
+			int _j = gaussRand(float(j), 1.f);
+			_i = clamp(_i, 0, N - 1);
+			_j = clamp(_j, 0, N - 1);
+			vec3 p = v[i*N + j];
+			p.y = v[_i*N + _j].y;
+			t.push_back(p);
+
+		}
+	}
+	v = t;*/
 	vector<vec3> normal;
+	vector<vec3> texcoord;
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			vec3 left, right, up, down;
@@ -123,17 +141,21 @@ GLuint create_terrain_vbo() {
 			down = i == N - 1 ? v[i*N + j] : v[(i + 1)*N + j];
 			left = j == 0 ? v[i*N] : v[i*N + j - 1];
 			right = j == N - 1 ? v[i*N + j] : v[i*N + j + 1];
-
+			vec3 uv((v[i*N + j].x + width / 2.f) / width, (v[i*N + j].z + width / 2.f) / width, 0.0f);
+			
+			texcoord.push_back(uv);
 			vec3 n = normalize(cross(right - left, up - down));
 			normal.push_back(n);
+
 		}
 	}
 	v.insert(v.end(), normal.begin(), normal.end());
+	v.insert(v.end(), texcoord.begin(), texcoord.end());
 	GLuint vbo = -1;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, v.size() * sizeof(vec3), &v[0], GL_STATIC_DRAW);
-
+	
 	return vbo;
 }
 GLuint create_terrain_ebo() {
@@ -162,10 +184,13 @@ GLuint create_terrain_vao() {
 
 	const GLuint pos_loc = 0;
 	const GLuint normal_loc = 1;
+	const GLuint texcoord_loc = 2;
 	glEnableVertexAttribArray(pos_loc);
 	glEnableVertexAttribArray(normal_loc);
+	glEnableVertexAttribArray(texcoord_loc);
 	glVertexAttribPointer(pos_loc, 3, GL_FLOAT, false, 0, 0);
 	glVertexAttribPointer(normal_loc, 3, GL_FLOAT, false, 0, (void*)(N*N*3*sizeof(float)));
+	glVertexAttribPointer(texcoord_loc, 3, GL_FLOAT, false, 0, (void*)(N*N * 3 * 2 * sizeof(float)));
 	glBindVertexArray(0);
 	return vao;
 }
@@ -178,7 +203,7 @@ void DrawTerrain(GLuint vao) {
 
 
 bool comp(const vec3 &a, const vec3 &b) {
-	float A = a.x + a.z*100.f;
-	float B = b.x + b.z*100.f;
+	float A = a.x + a.z*1000.f;
+	float B = b.x + b.z*1000.f;
 	return A < B;
 }
