@@ -115,23 +115,11 @@ GLuint create_terrain_vbo() {
 		hMin = v[i].y < hMin ? v[i].y : hMin;
 		hMax = v[i].y > hMax ? v[i].y : hMax;
 	}
-
-	/*vector<vec3> t;
-	float offset = width / (N - 1);
-	float w = width / 2.f;
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			int _i = gaussRand(float(i), 1.f);
-			int _j = gaussRand(float(j), 1.f);
-			_i = clamp(_i, 0, N - 1);
-			_j = clamp(_j, 0, N - 1);
-			vec3 p = v[i*N + j];
-			p.y = v[_i*N + _j].y;
-			t.push_back(p);
-
-		}
+	for (int i = 0; i < 50; i++) {
+		ThermalErosion(&v, N);
 	}
-	v = t;*/
+
+	
 	vector<vec3> normal;
 	vector<vec3> texcoord;
 	for (int i = 0; i < N; i++) {

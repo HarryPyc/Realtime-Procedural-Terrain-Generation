@@ -66,6 +66,9 @@
     <ClCompile Include="Voronoi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ThermalErosion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="template_fs.glsl">
@@ -122,6 +125,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Mathfunc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThermalErosion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
