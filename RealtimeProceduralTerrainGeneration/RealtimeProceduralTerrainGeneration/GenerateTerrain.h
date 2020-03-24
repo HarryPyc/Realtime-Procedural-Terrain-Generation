@@ -5,6 +5,7 @@
 #include "Voronoi.h"
 #include <glm/gtc/random.hpp>
 #include "ThermalErosion.h"
+#include "HydraulicErosion.h"
 #define RESTART 99999
 
 const int iterationTimes = 6;

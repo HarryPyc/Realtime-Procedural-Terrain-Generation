@@ -115,10 +115,10 @@ GLuint create_terrain_vbo() {
 		hMin = v[i].y < hMin ? v[i].y : hMin;
 		hMax = v[i].y > hMax ? v[i].y : hMax;
 	}
-	for (int i = 0; i < 50; i++) {
+	/*for (int i = 0; i < 100; i++) {
 		ThermalErosion(&v, N);
 	}
-
+	HydraulicErosion(&v, N, 100);*/
 	
 	vector<vec3> normal;
 	vector<vec3> texcoord;

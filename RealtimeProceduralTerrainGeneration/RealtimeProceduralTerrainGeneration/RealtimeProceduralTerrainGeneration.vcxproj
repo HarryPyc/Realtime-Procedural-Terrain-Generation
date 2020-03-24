@@ -147,6 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GenerateTerrain.cpp" />
+    <ClCompile Include="HydraulicErosion.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DebugCallback.cpp" />
     <ClCompile Include="imgui_impl_glut.cpp" />
@@ -169,6 +170,7 @@
   <ItemGroup>
     <ClInclude Include="DebugCallback.h" />
     <ClInclude Include="GenerateTerrain.h" />
+    <ClInclude Include="HydraulicErosion.h" />
     <ClInclude Include="imgui_impl_glut.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />
