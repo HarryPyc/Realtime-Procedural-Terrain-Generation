@@ -17,7 +17,9 @@ const float magnitude = 0.25f;
 
 GLuint create_surf_vao();
 GLuint create_voronoi_vao();
-GLuint create_terrain_vao();
+GLuint create_terrain_vao(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime);
 void DrawTerrain(GLuint vao);
 
+
+void GenerateNewTerrain();
 bool comp(const vec3 &a, const vec3 &b);

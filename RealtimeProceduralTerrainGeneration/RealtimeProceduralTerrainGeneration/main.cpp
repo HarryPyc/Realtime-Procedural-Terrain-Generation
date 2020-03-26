@@ -45,6 +45,12 @@ vec3 camPos(0.0f, 4.0f, 2.0f);
 extern float hMax;
 extern float hMin;
 bool useLight = false;
+
+float ratio = 0.667f;
+bool bThermal = true;
+int thermalTime = 50;
+int hydraulicTime = 50;
+bool bHydraulic = true;
 //Draw the user interface using ImGui
 void draw_gui()
 {
@@ -79,6 +85,23 @@ void draw_gui()
    ImGui::SliderFloat("View angle", &slider, -3.141592f, +3.141592f);
    ImGui::SliderFloat3("LightPos", &lightPos[0],-3.0f, 3.0f);
    ImGui::SliderFloat3("CameraPos", &camPos[0], -4.0f, 4.0f);
+   
+   ImGui::SliderFloat("1/f Noise:Voronoi", &ratio, 0.0f, 1.0f);
+
+   ImGui::Checkbox("Thermal Erosion", &bThermal);
+   ImGui::SliderInt("Thermal Times", &thermalTime, 0, 100);
+   ImGui::Checkbox("Hydraulic Erosion", &bHydraulic);
+   ImGui::SliderInt("Hydraulic Times", &hydraulicTime, 0, 100);
+
+   if (ImGui::Button("Generate Terrain")) {
+       time_sec = 0.f;
+       vao = create_terrain_vao(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
+       cout<<"Time Cost:"<< time_sec<< endl;
+   }
+   if (ImGui::Button("Generate New Terrain")) {
+       GenerateNewTerrain();
+       vao = create_terrain_vao(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
+   }
    ImGui::Checkbox("UseLight", &useLight);
    ImGui::Render();
  }
@@ -155,7 +178,9 @@ void display()
    if (useLight_loc) {
 	   glUniform1f(useLight_loc, useLight);
    }
-   DrawTerrain(vao);
+
+   if(vao != -1)
+     DrawTerrain(vao);
          
    draw_gui();
 
@@ -217,19 +242,19 @@ void initOpenGl()
    //Initialize glew so that new OpenGL function names can be used
 
    glewInit();
-   RegisterCallback();
+   //RegisterCallback();
    glEnable(GL_DEPTH_TEST);
 
    glEnable(GL_PRIMITIVE_RESTART);
-
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
    reload_shader();
    texGrass = LoadTexture(texGrass_name.c_str());
    texRock = LoadTexture(texRock_name.c_str());
    texRock2 = LoadTexture(texRock2_name.c_str());
    texSnow = LoadTexture(texSnow_name.c_str());
 
-   vao = create_terrain_vao();
-
+   GenerateNewTerrain();
+   vao = create_terrain_vao(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
 
 }
 
@@ -245,9 +270,7 @@ void keyboard(unsigned char key, int x, int y)
       case 'R':
          reload_shader();     
       break;
-	  case 32:
-		  vao = create_terrain_vao();
-		  break;
+
    }
 }
 
