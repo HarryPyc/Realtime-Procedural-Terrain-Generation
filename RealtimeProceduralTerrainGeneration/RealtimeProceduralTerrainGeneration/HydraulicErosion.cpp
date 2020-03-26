@@ -60,7 +60,9 @@ void WaterDistribution(vector<vec3>* v, vector<float>* w, vector<float>* m, int 
 		for (int _j = j - 1; _j <= j + 1; _j++) {
 			if (d[indexD] > 0) {
 				w->at(_i * N + _j) += deltaW * d[indexD] / dTotal;
-				m->at(_i * N + _j) += deltaW / water * mat;
+				float deltaM = deltaW /water * mat * d[indexD] / dTotal;
+				m->at(_i * N + _j) += deltaM;
+				m->at(i * N + j) -= deltaM;
 			}
 			indexD++;
 		}

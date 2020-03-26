@@ -94,9 +94,7 @@ void draw_gui()
    ImGui::SliderInt("Hydraulic Times", &hydraulicTime, 0, 100);
 
    if (ImGui::Button("Generate Terrain")) {
-       time_sec = 0.f;
        vao = create_terrain_vao(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
-       cout<<"Time Cost:"<< time_sec<< endl;
    }
    if (ImGui::Button("Generate New Terrain")) {
        GenerateNewTerrain();
