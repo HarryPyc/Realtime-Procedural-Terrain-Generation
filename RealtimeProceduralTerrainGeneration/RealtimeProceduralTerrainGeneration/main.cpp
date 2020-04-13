@@ -40,12 +40,13 @@ float time_sec = 0.0f;
 float slider = 0.0f;
 bool recording = false;
 GLuint vao = -1;
-vec3 lightPos(0, 2, 0);
+vec3 lightDir(-1, -1, -1);
 vec3 camPos(0.0f, 4.0f, 2.0f);
 extern float hMax;
 extern float hMin;
 bool useLight = false;
 
+Terrain* terrain;
 float ratio = 0.667f;
 bool bThermal = true;
 int thermalTime = 50;
@@ -83,22 +84,36 @@ void draw_gui()
 
    //create a slider to change the angle variables
    ImGui::SliderFloat("View angle", &slider, -3.141592f, +3.141592f);
-   ImGui::SliderFloat3("LightPos", &lightPos[0],-3.0f, 3.0f);
+   ImGui::SliderFloat3("LightDir", &lightDir[0],-1.0f, 1.0f);
    ImGui::SliderFloat3("CameraPos", &camPos[0], -4.0f, 4.0f);
    
    ImGui::SliderFloat("1/f Noise:Voronoi", &ratio, 0.0f, 1.0f);
 
    ImGui::Checkbox("Thermal Erosion", &bThermal);
    ImGui::SliderInt("Thermal Times", &thermalTime, 0, 100);
+   if (ImGui::Button("GetThermalErosion")) {
+       if (bThermal) {
+           terrain->thermal(thermalTime);
+           vao = create_terrain_vao(&terrain->v, terrain->N);
+       }
+   }
    ImGui::Checkbox("Hydraulic Erosion", &bHydraulic);
    ImGui::SliderInt("Hydraulic Times", &hydraulicTime, 0, 100);
-
+   if (ImGui::Button("GetHydraulicErosion")) {
+       if (bHydraulic) {
+           terrain->hydraulic(hydraulicTime);
+           vao = create_terrain_vao(&terrain->v, terrain->N);
+       }
+   }
+   ImGui::Spacing();
    if (ImGui::Button("Generate Terrain")) {
-       vao = create_terrain_vao(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
+       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
+       vao = create_terrain_vao(&terrain->v, terrain->N);
    }
    if (ImGui::Button("Generate New Terrain")) {
-       GenerateNewTerrain();
-       vao = create_terrain_vao(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
+       terrain->init();
+       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
+       vao = create_terrain_vao(&terrain->v, terrain->N);
    }
    ImGui::Checkbox("UseLight", &useLight);
    ImGui::Render();
@@ -151,7 +166,7 @@ void display()
 
    int light_loc = glGetUniformLocation(shader_program, "light");
    if (light_loc != -1) {
-	   glUniform3fv(light_loc, 1, &lightPos[0]);
+	   glUniform3fv(light_loc, 1, &lightDir[0]);
    }
    int PVM_loc = glGetUniformLocation(shader_program, "PVM");
    if (PVM_loc != -1)
@@ -178,7 +193,7 @@ void display()
    }
 
    if(vao != -1)
-     DrawTerrain(vao);
+     DrawTerrain(vao, terrain->N);
          
    draw_gui();
 
@@ -251,8 +266,8 @@ void initOpenGl()
    texRock2 = LoadTexture(texRock2_name.c_str());
    texSnow = LoadTexture(texSnow_name.c_str());
 
-   GenerateNewTerrain();
-   vao = create_terrain_vao(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
+   terrain = new Terrain();
+   vao = create_terrain_vao(&terrain->v, terrain->N);
 
 }
 

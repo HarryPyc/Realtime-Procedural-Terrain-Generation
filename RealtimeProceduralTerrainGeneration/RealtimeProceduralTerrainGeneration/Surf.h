@@ -43,6 +43,7 @@ public:
 	vector<Point*> points;
 	vector<Edge*> edges;
 	vector<Square*> squares;
+	vector<vec3> v;
 
 	Surf(float w, float spread);
 	Surf();

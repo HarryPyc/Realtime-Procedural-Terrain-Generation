@@ -1,11 +1,12 @@
 #include "HydraulicErosion.h"
-
+vector<float> *w, *m;
+void initHydraulicErosion(int N) {
+	w = new vector<float>(N * N, 0.f);
+	m = new vector<float>(N * N, 0.f);
+}
 void WaterDistribution(vector<vec3>* v, vector<float>* w, vector<float>* m, int i, int j, int N);
 void HydraulicErosion(vector<vec3>* v, int N, int times)
 {
-	vector<float>* w = new vector<float>(N * N, 0.f);
-	vector<float>* m = new vector<float>(N * N, 0.f);
-	
 	for (int c = 0; c < times; c++) {
 		//step 1: stimulate rains
 		vector<float>::iterator itw = w->begin();

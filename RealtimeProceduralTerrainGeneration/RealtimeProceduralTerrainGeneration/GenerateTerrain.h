@@ -14,12 +14,25 @@ const float initialSpread = 1.0f;
 const int randomPointsNum = 20;
 const float magnitude = 0.25f;
 
+class Terrain {
+public:
+	vector<vec3> v;
+	int N;
+	Terrain();
+	void thermal(int time);
+	void hydraulic(int time);
+	
+	void init();
+	void update(float ratio = 0.667f, bool bThermal = true, int tTime = 50, bool bHydraulic = true, int hTime = 50);
+private:
+	Surf* surf;
+	Voronoi* vor;
+};
 
-GLuint create_surf_vao();
-GLuint create_voronoi_vao();
-GLuint create_terrain_vao(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime);
-void DrawTerrain(GLuint vao);
+
+GLuint create_terrain_vao(vector<vec3> *v, int N);
+void DrawTerrain(GLuint vao, int N);
 
 
-void GenerateNewTerrain();
+
 bool comp(const vec3 &a, const vec3 &b);
