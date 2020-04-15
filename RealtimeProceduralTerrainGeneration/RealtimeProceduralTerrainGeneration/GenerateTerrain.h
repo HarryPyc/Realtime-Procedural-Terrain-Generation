@@ -20,6 +20,7 @@ public:
 	int N;
 	float hMax = -999.f;
 	float hMin = 999.f;
+	int Tcount = 0, Hcount = 0;
 	Terrain();
 	void thermal(int time);
 	void hydraulic(int time);

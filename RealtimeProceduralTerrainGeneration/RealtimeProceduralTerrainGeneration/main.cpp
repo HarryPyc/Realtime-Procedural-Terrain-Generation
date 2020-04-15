@@ -42,7 +42,7 @@ bool recording = false;
 GLuint vao = -1;
 vec3 lightDir(-1, -1, -1);
 vec3 camPos(0.0f, 4.0f, 2.0f);
-bool useLight = false;
+bool useLight = true;
 
 Terrain* terrain;
 float ratio = 0.667f;
@@ -96,6 +96,9 @@ void draw_gui()
            vao = create_terrain_vao(&terrain->v, terrain->N);
        }
    }
+   ImGui::SameLine();
+   std::string totalTimes = "Total Times:" + std::to_string(terrain->Tcount);
+   ImGui::Text(totalTimes.c_str());
    ImGui::Checkbox("Hydraulic Erosion", &bHydraulic);
    ImGui::SliderInt("Hydraulic Times", &hydraulicTime, 0, 100);
    if (ImGui::Button("GetHydraulicErosion")) {
@@ -104,6 +107,9 @@ void draw_gui()
            vao = create_terrain_vao(&terrain->v, terrain->N);
        }
    }
+   ImGui::SameLine();
+   std::string HtotalTimes = "Total Times:" + std::to_string(terrain->Hcount);
+   ImGui::Text(HtotalTimes.c_str());
    ImGui::Spacing();
    if (ImGui::Button("Generate Terrain")) {
        terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime, c);

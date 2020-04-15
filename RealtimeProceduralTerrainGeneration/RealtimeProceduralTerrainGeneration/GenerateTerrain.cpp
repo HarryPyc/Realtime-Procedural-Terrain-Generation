@@ -99,6 +99,8 @@ void Terrain::init() {
 void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime, float c) {
 	v.clear();
 	initHydraulicErosion(N);
+	Tcount = 0;
+	Hcount = 0;
 	for (int i = 0; i < N * N; i++) {
 		v.push_back(surf->v[i]);
 		v[i].y = surf->v[i].y * ratio + vor->v[i].y * (1.f - ratio);
@@ -117,13 +119,15 @@ void Terrain::thermal(int time) {
 	for (int i = 0; i < time; i++) {
 		ThermalErosion(&v, N);
 	}
+	Tcount += time;
 }
 void Terrain::hydraulic(int time) {
 	HydraulicErosion(&v, N, time);
+	Hcount += time;
 }
 void Terrain::turb(float c) {
 	vector<vec3>::iterator it = v.begin();
 	for (it; it < v.end(); it++) {
-		it->y = (sin(it->x+it->y+c*it->y)) ;
+		it->y = (1.f+sin((it->x+it->z+c*it->y)))/2.f ;
 	}
 }
