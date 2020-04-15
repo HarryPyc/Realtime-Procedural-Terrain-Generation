@@ -7,6 +7,7 @@ void initHydraulicErosion(int N) {
 void WaterDistribution(vector<vec3>* v, vector<float>* w, vector<float>* m, int i, int j, int N);
 void HydraulicErosion(vector<vec3>* v, int N, int times)
 {
+	
 	for (int c = 0; c < times; c++) {
 		//step 1: stimulate rains
 		vector<float>::iterator itw = w->begin();

@@ -18,12 +18,15 @@ class Terrain {
 public:
 	vector<vec3> v;
 	int N;
+	float hMax = -999.f;
+	float hMin = 999.f;
 	Terrain();
 	void thermal(int time);
 	void hydraulic(int time);
+	void turb(float c = 1.5f);
 	
 	void init();
-	void update(float ratio = 0.667f, bool bThermal = true, int tTime = 50, bool bHydraulic = true, int hTime = 50);
+	void update(float ratio = 0.667f, bool bThermal = true, int tTime = 50, bool bHydraulic = true, int hTime = 50, float c = 1.5f);
 private:
 	Surf* surf;
 	Voronoi* vor;

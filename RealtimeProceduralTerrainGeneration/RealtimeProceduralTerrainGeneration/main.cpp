@@ -42,8 +42,6 @@ bool recording = false;
 GLuint vao = -1;
 vec3 lightDir(-1, -1, -1);
 vec3 camPos(0.0f, 4.0f, 2.0f);
-extern float hMax;
-extern float hMin;
 bool useLight = false;
 
 Terrain* terrain;
@@ -52,6 +50,7 @@ bool bThermal = true;
 int thermalTime = 50;
 int hydraulicTime = 50;
 bool bHydraulic = true;
+float c = 1.5f;
 //Draw the user interface using ImGui
 void draw_gui()
 {
@@ -88,7 +87,7 @@ void draw_gui()
    ImGui::SliderFloat3("CameraPos", &camPos[0], -4.0f, 4.0f);
    
    ImGui::SliderFloat("1/f Noise:Voronoi", &ratio, 0.0f, 1.0f);
-
+   //ImGui::SliderFloat("Turbulence", &c, 0.0f, 5.f);
    ImGui::Checkbox("Thermal Erosion", &bThermal);
    ImGui::SliderInt("Thermal Times", &thermalTime, 0, 100);
    if (ImGui::Button("GetThermalErosion")) {
@@ -107,15 +106,15 @@ void draw_gui()
    }
    ImGui::Spacing();
    if (ImGui::Button("Generate Terrain")) {
-       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
+       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime, c);
        vao = create_terrain_vao(&terrain->v, terrain->N);
    }
    if (ImGui::Button("Generate New Terrain")) {
        terrain->init();
-       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
+       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime, c);
        vao = create_terrain_vao(&terrain->v, terrain->N);
    }
-   ImGui::Checkbox("UseLight", &useLight);
+   ImGui::Checkbox("UseTexture", &useLight);
    ImGui::Render();
  }
 
@@ -179,18 +178,12 @@ void display()
    {
 	   glUniformMatrix4fv(M_loc, 1, false, glm::value_ptr(M));
    }
-   int hMin_loc = glGetUniformLocation(shader_program, "hMin");
-   if (hMin_loc) {
-	   glUniform1f(hMin_loc, hMin);
-   }
-   int hMax_loc = glGetUniformLocation(shader_program, "hMax");
-   if (hMax_loc) {
-	   glUniform1f(hMax_loc, hMax);
-   }
    int useLight_loc = glGetUniformLocation(shader_program, "useLight");
    if (useLight_loc) {
 	   glUniform1f(useLight_loc, useLight);
    }
+   glUniform1f(glGetUniformLocation(shader_program, "hMin"), terrain->hMin);
+   glUniform1f(glGetUniformLocation(shader_program, "hMax"), terrain->hMax);
 
    if(vao != -1)
      DrawTerrain(vao, terrain->N);

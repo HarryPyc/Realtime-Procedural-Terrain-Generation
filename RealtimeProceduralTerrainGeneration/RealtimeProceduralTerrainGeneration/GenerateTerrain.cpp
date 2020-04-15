@@ -1,7 +1,6 @@
 #include "GenerateTerrain.h"
 
-float hMax = -999.f;
-float hMin = 999.f;
+
 GLuint create_terrain_vbo(vector<vec3> *vert,int N) {
 	vector<vec3> v = *vert;
 	vector<vec3> normal;
@@ -97,14 +96,16 @@ void Terrain::init() {
 	sort(surf->v.begin(), surf->v.end(), comp);
 	initHydraulicErosion(N);
 }
-void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime) {
+void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime, float c) {
 	v.clear();
+	initHydraulicErosion(N);
 	for (int i = 0; i < N * N; i++) {
 		v.push_back(surf->v[i]);
 		v[i].y = surf->v[i].y * ratio + vor->v[i].y * (1.f - ratio);
 		hMin = v[i].y < hMin ? v[i].y : hMin;
 		hMax = v[i].y > hMax ? v[i].y : hMax;
 	}
+	//turb(c);
 	if (bThermal) {
 		thermal(tTime);
 	}
@@ -119,4 +120,10 @@ void Terrain::thermal(int time) {
 }
 void Terrain::hydraulic(int time) {
 	HydraulicErosion(&v, N, time);
+}
+void Terrain::turb(float c) {
+	vector<vec3>::iterator it = v.begin();
+	for (it; it < v.end(); it++) {
+		it->y = (sin(it->x+it->y+c*it->y)) ;
+	}
 }
