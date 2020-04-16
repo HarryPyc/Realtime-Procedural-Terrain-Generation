@@ -30,11 +30,13 @@ static const std::string texGrass_name = "textures/T_Ground_Grass_1_BC_R.tga";
 static const std::string texRock_name = "textures/T_Ground_Rock_2_BC_R.tga";
 static const std::string texRock2_name = "textures/T_Ground_Rock_5_BC_R.tga";
 static const std::string texSnow_name = "textures/T_Ground_Snow_1_BC_R.tga";
+static const std::string texMud_name = "textures/T_Ground_Mud_1_BC_R.tga";
 
 GLuint texGrass = -1;
 GLuint texRock = -1;
 GLuint texRock2 = -1; 
 GLuint texSnow = -1;
+GLuint texMud = -1;
 
 float time_sec = 0.0f;
 float slider = 0.0f;
@@ -50,7 +52,8 @@ bool bThermal = true;
 int thermalTime = 50;
 int hydraulicTime = 50;
 bool bHydraulic = true;
-float c = 1.5f;
+float c = 2.0f;
+bool enableTurb = false;
 //Draw the user interface using ImGui
 void draw_gui()
 {
@@ -87,7 +90,8 @@ void draw_gui()
    ImGui::SliderFloat3("CameraPos", &camPos[0], -4.0f, 4.0f);
    
    ImGui::SliderFloat("1/f Noise:Voronoi", &ratio, 0.0f, 1.0f);
-   //ImGui::SliderFloat("Turbulence", &c, 0.0f, 5.f);
+   ImGui::Checkbox("Enable Turbulence", &enableTurb);
+   ImGui::SliderFloat("Turbulence", &c, 0.0f, 5.f);
    ImGui::Checkbox("Thermal Erosion", &bThermal);
    ImGui::SliderInt("Thermal Times", &thermalTime, 0, 100);
    if (ImGui::Button("GetThermalErosion")) {
@@ -112,12 +116,12 @@ void draw_gui()
    ImGui::Text(HtotalTimes.c_str());
    ImGui::Spacing();
    if (ImGui::Button("Generate Terrain")) {
-       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime, c);
+       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime, c, enableTurb);
        vao = create_terrain_vao(&terrain->v, terrain->N);
    }
    if (ImGui::Button("Generate New Terrain")) {
        terrain->init();
-       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime, c);
+       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime, c, enableTurb);
        vao = create_terrain_vao(&terrain->v, terrain->N);
    }
    ImGui::Checkbox("UseTexture", &useLight);
@@ -148,6 +152,8 @@ void display()
    glBindTexture(GL_TEXTURE_2D, texRock2);
    glActiveTexture(GL_TEXTURE3);
    glBindTexture(GL_TEXTURE_2D, texSnow);
+   glActiveTexture(GL_TEXTURE4);
+   glBindTexture(GL_TEXTURE_2D, texMud);
    int texGrass_loc = glGetUniformLocation(shader_program, "grass");
    if (texGrass_loc != -1)
    {
@@ -167,6 +173,11 @@ void display()
    if (texSnow_loc != -1)
    {
 	   glUniform1i(texSnow_loc, 3); // we bound our texture to texture unit 0
+   }
+   int texMud_loc = glGetUniformLocation(shader_program, "mud");
+   if (texMud_loc != -1)
+   {
+       glUniform1i(texMud_loc, 4); // we bound our texture to texture unit 0
    }
 
    int light_loc = glGetUniformLocation(shader_program, "light");
@@ -264,7 +275,7 @@ void initOpenGl()
    texRock = LoadTexture(texRock_name.c_str());
    texRock2 = LoadTexture(texRock2_name.c_str());
    texSnow = LoadTexture(texSnow_name.c_str());
-
+   texMud = LoadTexture(texMud_name.c_str());
    terrain = new Terrain();
    vao = create_terrain_vao(&terrain->v, terrain->N);
 

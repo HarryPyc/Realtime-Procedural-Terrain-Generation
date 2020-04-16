@@ -96,7 +96,7 @@ void Terrain::init() {
 	sort(surf->v.begin(), surf->v.end(), comp);
 	initHydraulicErosion(N);
 }
-void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime, float c) {
+void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime, float c, bool enableTurb) {
 	v.clear();
 	initHydraulicErosion(N);
 	Tcount = 0;
@@ -107,7 +107,8 @@ void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int
 		hMin = v[i].y < hMin ? v[i].y : hMin;
 		hMax = v[i].y > hMax ? v[i].y : hMax;
 	}
-	//turb(c);
+	if(enableTurb)
+		turb(c);
 	if (bThermal) {
 		thermal(tTime);
 	}
@@ -128,6 +129,6 @@ void Terrain::hydraulic(int time) {
 void Terrain::turb(float c) {
 	vector<vec3>::iterator it = v.begin();
 	for (it; it < v.end(); it++) {
-		it->y = (1.f+sin((it->x+it->z+c*it->y)))/2.f ;
+		it->y = (1.f+sin((it->x+c*it->y)))/2.f ;
 	}
 }

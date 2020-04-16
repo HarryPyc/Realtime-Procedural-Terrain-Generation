@@ -7,6 +7,7 @@ uniform sampler2D grass;
 uniform sampler2D rock;
 uniform sampler2D rock2;
 uniform sampler2D snow;
+uniform sampler2D mud;
 
 out vec4 fragcolor;           
 in vec3 p;
@@ -30,6 +31,8 @@ void main(void)
 		vec4 cRock = texture(rock, uv.xy);
 		vec4 cRock2 = texture(rock2, uv.xy);
 		vec4 cSnow = texture(snow, uv.xy);
+		vec4 cMud = texture(mud, uv.xy);
+		cGrass = mix(cGrass,cMud,0.5);
 		if(h<0.3f)
 			color = mix(cGrass, cRock, h / 0.3f);
 		else if(h<0.6f)

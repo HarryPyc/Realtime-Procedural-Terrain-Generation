@@ -27,7 +27,7 @@ public:
 	void turb(float c = 1.5f);
 	
 	void init();
-	void update(float ratio = 0.667f, bool bThermal = true, int tTime = 50, bool bHydraulic = true, int hTime = 50, float c = 1.5f);
+	void update(float ratio = 0.667f, bool bThermal = true, int tTime = 50, bool bHydraulic = true, int hTime = 50, float c = 1.5f, bool enableTurb = false);
 private:
 	Surf* surf;
 	Voronoi* vor;
