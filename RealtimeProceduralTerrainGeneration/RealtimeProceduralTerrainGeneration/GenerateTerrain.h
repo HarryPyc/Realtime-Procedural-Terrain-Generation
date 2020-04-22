@@ -8,7 +8,7 @@
 #include "HydraulicErosion.h"
 #define RESTART 99999
 
-const int iterationTimes = 6;
+const int iterationTimes = 7;
 const float width = 4.0f;
 const float initialSpread = 1.0f;
 const int randomPointsNum = 20;
