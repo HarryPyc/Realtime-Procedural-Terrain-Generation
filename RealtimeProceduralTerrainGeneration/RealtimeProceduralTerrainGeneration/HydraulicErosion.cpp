@@ -1,5 +1,5 @@
 #include "HydraulicErosion.h"
-#include <omp.h>
+
 vector<float> *w, *m;
 void initHydraulicErosion(int N) {
 	w = new vector<float>(N * N, 0.0f);
@@ -48,9 +48,11 @@ void HydraulicErosion(vector<vec3>* v, int N, int times)
 	
 }
 void WaterDistribution(vector<vec3>* v, vector<float>* w, vector<float>* m, int i, int j, int N) {
-	vector<float> a, d;
+	vector<float> a, d;//altitude and difference
+	//water and material at center
 	float water = w->at(i * N + j);
 	float mat = m->at(i * N + j);
+	//altitude at center
 	float A = v->at(i * N + j).y + water;
 	float dTotal = 0.f, a_bar = 0.f;
 	for (int _i = i - 1; _i <= i + 1; _i++) {
@@ -63,6 +65,7 @@ void WaterDistribution(vector<vec3>* v, vector<float>* w, vector<float>* m, int 
 			d.push_back(diff);
 		}
 	}
+	//average altitude
 	a_bar /= 9.f;
 	float deltaA = A - a_bar;
 	if (deltaA <= 0) return;
@@ -72,6 +75,7 @@ void WaterDistribution(vector<vec3>* v, vector<float>* w, vector<float>* m, int 
 	for (int _i = i - 1; _i <= i + 1; _i++) {
 		for (int _j = j - 1; _j <= j + 1; _j++) {
 			if (d[indexD] > 0) {
+				//move water and material to lower neighbors
 				w->at(_i * N + _j) += deltaW * d[indexD] / dTotal;
 				float deltaM = deltaW /water * mat * d[indexD] / dTotal;
 				m->at(_i * N + _j) += deltaM;

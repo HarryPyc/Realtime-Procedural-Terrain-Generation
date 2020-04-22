@@ -1,5 +1,6 @@
 #pragma once
 #include "Mathfunc.h"
+#include <omp.h>
 const float Kr = 0.01f;
 const float Ks = 0.01f;
 const float Ke = 0.5f;

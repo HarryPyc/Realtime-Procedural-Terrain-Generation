@@ -90,8 +90,8 @@ void draw_gui()
    ImGui::SliderFloat3("CameraPos", &camPos[0], -4.0f, 4.0f);
    
    ImGui::SliderFloat("1/f Noise:Voronoi", &ratio, 0.0f, 1.0f);
-   ImGui::Checkbox("Enable Turbulence", &enableTurb);
-   ImGui::SliderFloat("Turbulence", &c, 0.0f, 5.f);
+   //ImGui::Checkbox("Enable Turbulence", &enableTurb);
+   //ImGui::SliderFloat("Turbulence", &c, 0.0f, 5.f);
    ImGui::Checkbox("Thermal Erosion", &bThermal);
    ImGui::SliderInt("Thermal Times", &thermalTime, 0, 100);
    if (ImGui::Button("GetThermalErosion")) {

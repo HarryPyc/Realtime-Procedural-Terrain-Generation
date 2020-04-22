@@ -67,8 +67,6 @@ GLuint create_terrain_vao(vector<vec3> *v,int N) {
 }
 void DrawTerrain(GLuint vao, int N) {
 	glBindVertexArray(vao);
-	//glDrawArrays(GL_TRIANGLES, 0, N);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDrawElements(GL_TRIANGLE_STRIP, 2*N*N + N-1, GL_UNSIGNED_INT, 0);
 }
 
@@ -85,15 +83,17 @@ Terrain::Terrain()
 	update();
 }
 void Terrain::init() {
-	
+	//get Voronoi map and noise map
 	vor = new Voronoi(iterationTimes, randomPointsNum, -1.0f, 1.0f, width);
 	surf = new Surf(width, initialSpread);
 	for (int i = 0; i < iterationTimes; i++)
 		surf = surf->MidpointDisplacement();
 	N = vor->N;
+	//The map we get from midpoint displacement is disordered
 	for (int i = 0; i < N * N; i++)
 		surf->v.push_back(surf->points[i]->p);
 	sort(surf->v.begin(), surf->v.end(), comp);
+
 	initHydraulicErosion(N);
 }
 void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime, float c, bool enableTurb) {
@@ -101,14 +101,15 @@ void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int
 	initHydraulicErosion(N);
 	Tcount = 0;
 	Hcount = 0;
+	//Addition of noise and Voronoi map
 	for (int i = 0; i < N * N; i++) {
 		v.push_back(surf->v[i]);
 		v[i].y = surf->v[i].y * ratio + vor->v[i].y * (1.f - ratio);
 		hMin = v[i].y < hMin ? v[i].y : hMin;
 		hMax = v[i].y > hMax ? v[i].y : hMax;
 	}
-	if(enableTurb)
-		turb(c);
+	//if(enableTurb)
+	//	turb(c);
 	if (bThermal) {
 		thermal(tTime);
 	}

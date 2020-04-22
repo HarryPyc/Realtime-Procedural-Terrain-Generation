@@ -10,10 +10,12 @@ float getNewHeight(float h, float d, float dMax, float dTotal, float T) {
 }
 void iteration(vector<vec3> *v, int i, int j, int N) {
 	float h = v->at((i)*N + j).y;
+	//get 4 neighbors
 	float h1 = v->at((i - 1) * N + j - 1).y;
 	float h2 = v->at((i - 1) * N + j + 1).y;
 	float h3 = v->at((i + 1) * N + j - 1).y;
 	float h4 = v->at((i + 1) * N + j + 1).y;
+	//difference
 	float d1 = h - h1;
 	float d2 = h - h2;
 	float d3 = h - h3;
@@ -26,7 +28,7 @@ void iteration(vector<vec3> *v, int i, int j, int N) {
 	if (d2 > T) dTotal += d2;
 	if (d3 > T) dTotal += d3; 
 	if (d4 > T) dTotal += d4;
-	
+	//deposit soil to lower neighbors according to ratio d/dTotal
 	v->at((i - 1) * N + j - 1).y = getNewHeight(h1, d1, dMax, dTotal, T);
 	v->at((i - 1) * N + j + 1).y = getNewHeight(h2, d2, dMax, dTotal, T);
 	v->at((i + 1) * N + j - 1).y = getNewHeight(h3, d3, dMax, dTotal, T);

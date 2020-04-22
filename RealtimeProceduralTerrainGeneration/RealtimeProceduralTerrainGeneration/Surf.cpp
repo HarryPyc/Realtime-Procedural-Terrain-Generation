@@ -74,6 +74,7 @@ void Square::GenerateNewSquares() {
 Surf::Surf(float w, float spread) {
 	float width = w / 2.f;
 	this->spread = spread;
+	//4 initial points
 	vec3 v0(-width, random11(), -width), v1(width, random11(), -width),
 		v2(-width, random11(), width), v3(width, random11(), width);
 	Point *a = new Point(v0),
@@ -82,26 +83,30 @@ Surf::Surf(float w, float spread) {
 		  *d = new Point(v3);
 	points.push_back(a); points.push_back(b);
 	points.push_back(c); points.push_back(d);
-
+	//4 initial edges
 	Edge *e0 = new Edge(a, b), *e1 = new Edge(b, d),
 		 *e2 = new Edge(c, d), *e3 = new Edge(a, c);
 	edges.push_back(e0); edges.push_back(e1);
 	edges.push_back(e2); edges.push_back(e3);
+	//1 initial face
 	Square *s = new Square(e0, e1, e2, e3);
 	squares.push_back(s);
 }
-
+// this is very similar to Catmull-Clark Subdivision 
 Surf* Surf::MidpointDisplacement() {
 	Surf* surf = new Surf();
+	//original points
 	vector<Point*>::iterator itp = points.begin();
 	for (itp; itp < points.end(); itp++) {
 		surf->points.push_back(*itp);
 	}
+	//get new mid points
 	vector<Square*>::iterator its = squares.begin();
 	for (its; its < squares.end(); its++) {
 		(*its)->GetMidPoint(spread);
 		surf->points.push_back((*its)->mid);
 	}
+	//edges split into two
 	vector<Edge*>::iterator ite = edges.begin();
 	for (ite; ite < edges.end(); ite++) {
 		(*ite)->GetMidPoint(spread);
@@ -111,7 +116,7 @@ Surf* Surf::MidpointDisplacement() {
 		surf->edges.push_back((*ite)->ne0);
 		surf->edges.push_back((*ite)->ne1);
 	}
-
+	//1 face generate 4 new faces and edges
 	for (its = squares.begin(); its < squares.end(); its++) {
 
 		(*its)->GenerateNewSquares();
@@ -126,6 +131,7 @@ Surf* Surf::MidpointDisplacement() {
 		surf->squares.push_back((*its)->nf2);
 		surf->squares.push_back((*its)->nf3);
 	}
+
 	surf->spread = spread * 0.5f;
 	return surf;
 }
