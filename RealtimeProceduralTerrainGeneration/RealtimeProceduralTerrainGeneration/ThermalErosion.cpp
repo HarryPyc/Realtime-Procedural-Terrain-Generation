@@ -39,6 +39,7 @@ void iteration(vector<vec3> *v, int i, int j, int N) {
 }
 void ThermalErosion(vector<vec3> *v, int N)
 {
+#pragma omp parallel for
 	for (int i = 1; i < N - 1; i++) {
 		for (int j = 1; j < N - 1; j++) {
 			iteration(v, i, j, N);

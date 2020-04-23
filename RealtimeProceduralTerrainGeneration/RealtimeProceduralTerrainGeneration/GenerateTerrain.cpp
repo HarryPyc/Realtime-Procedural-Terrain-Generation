@@ -2,17 +2,19 @@
 
 
 GLuint create_terrain_vbo(vector<vec3> *vert,int N) {
-	vector<vec3> v = *vert;
+	vector<vec3> v;
 	vector<vec3> normal;
 	vector<vec3> texcoord;
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
+	for (int i = 1; i < N-1; i++) {
+		for (int j = 1; j < N-1; j++) {
 			vec3 left, right, up, down;
-			up = i == 0 ? v[j] : v[(i - 1)*N + j];
-			down = i == N - 1 ? v[i*N + j] : v[(i + 1)*N + j];
-			left = j == 0 ? v[i*N] : v[i*N + j - 1];
-			right = j == N - 1 ? v[i*N + j] : v[i*N + j + 1];
-			vec3 uv((v[i*N + j].x + width / 2.f) / width, (v[i*N + j].z + width / 2.f) / width, 0.0f);
+			up = vert->at((i - 1) * N + j);
+			down = vert->at((i + 1) * N + j);
+			left = vert->at(i * N + j - 1);
+			right = vert->at(i * N + j + 1);
+			vec3 p = vert->at(i * N + j);
+			v.push_back(p);
+			vec3 uv((p.x + width / 2.f) / width, (p.z + width / 2.f) / width, 0.0f);
 			
 			texcoord.push_back(uv);
 			vec3 n = normalize(cross(right - left, up - down));
@@ -51,6 +53,7 @@ GLuint create_terrain_vao(vector<vec3> *v,int N) {
 	glBindVertexArray(vao);
 
 	GLuint vbo = create_terrain_vbo(v,N);
+	N = N - 2;
 	GLuint ebo = create_terrain_ebo(N);
 
 	const GLuint pos_loc = 0;
@@ -72,15 +75,19 @@ void DrawTerrain(GLuint vao, int N) {
 
 
 bool comp(const vec3 &a, const vec3 &b) {
-	float A = a.x + a.z*1000.f;
-	float B = b.x + b.z*1000.f;
-	return A < B;
+	float A = a.x + a.z*10000.f;
+	float B = b.x + b.z*10000.f;
+	return A - B < FLT_EPSILON;
 }
 
-Terrain::Terrain()
+Terrain::Terrain(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime)
 {
 	init();
-	update();
+	update(ratio, bThermal, tTime, bHydraulic, hTime);
+}
+Terrain::~Terrain()
+{
+	delete surf, vor;
 }
 void Terrain::init() {
 	//get Voronoi map and noise map
@@ -94,11 +101,10 @@ void Terrain::init() {
 		surf->v.push_back(surf->points[i]->p);
 	sort(surf->v.begin(), surf->v.end(), comp);
 
-	initHydraulicErosion(N);
 }
-void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime, float c, bool enableTurb) {
+void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime) {
 	v.clear();
-	initHydraulicErosion(N);
+	//initHydraulicErosion(N);
 	Tcount = 0;
 	Hcount = 0;
 	//Addition of noise and Voronoi map

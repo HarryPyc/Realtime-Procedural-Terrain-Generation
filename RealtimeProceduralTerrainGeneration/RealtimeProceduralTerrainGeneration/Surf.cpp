@@ -26,6 +26,9 @@ Edge::Edge(Point *a, Point *b)
 		this->b->up = a->p;
 	}
 }
+Edge::~Edge() {
+	
+}
 void Edge::GetMidPoint(float spread) {
 	vec3 p = a->p + b->p;
 	int n = 2;
@@ -53,6 +56,9 @@ Square::Square(Edge *e0, Edge *e1, Edge *e2, Edge *e3) {
 	e1->squares.push_back(this);
 	e2->squares.push_back(this);
 	e3->squares.push_back(this);
+}
+Square::~Square() {
+
 }
 void Square::GetMidPoint(float spread) {
 	vec3 p = (e0->a->p + e0->b->p + e2->a->p + e2->b->p) / 4.f 
@@ -96,6 +102,7 @@ Surf::Surf(float w, float spread) {
 Surf* Surf::MidpointDisplacement() {
 	Surf* surf = new Surf();
 	//original points
+
 	vector<Point*>::iterator itp = points.begin();
 	for (itp; itp < points.end(); itp++) {
 		surf->points.push_back(*itp);
@@ -149,6 +156,22 @@ Surf::Surf()
 
 Surf::~Surf()
 {
+	vector<Point*>::iterator itp = points.begin();
+	for (itp; itp < points.end(); itp++) {
+		delete* itp;
+	}
+	points.clear();
+	vector<Edge*>::iterator ite = edges.begin();
+	for (ite; ite < edges.end(); ite++) {
+		delete* ite;
+	}
+	edges.clear();
+	vector<Square*>::iterator its = squares.begin();
+	for (its; its < squares.end(); its++) {
+		delete* its;
+	}
+	squares.clear();
+	v.clear();
 }
 
 inline vec3 offset(float spread) {

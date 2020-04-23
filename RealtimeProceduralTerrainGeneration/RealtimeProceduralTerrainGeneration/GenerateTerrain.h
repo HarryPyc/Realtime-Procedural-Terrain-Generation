@@ -8,11 +8,11 @@
 #include "HydraulicErosion.h"
 #define RESTART 99999
 
-const int iterationTimes = 7;
-const float width = 4.0f;
-const float initialSpread = 1.0f;
+const int iterationTimes = 10;
+const float width = 16.0f;
+const float initialSpread = 4.0f;
 const int randomPointsNum = 20;
-const float magnitude = 0.25f;
+
 
 class Terrain {
 public:
@@ -21,13 +21,14 @@ public:
 	float hMax = -999.f;
 	float hMin = 999.f;
 	int Tcount = 0, Hcount = 0;
-	Terrain();
+	Terrain(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime);
+	~Terrain();
 	void thermal(int time);
 	void hydraulic(int time);
 	void turb(float c = 1.5f);
 	
 	void init();
-	void update(float ratio = 0.667f, bool bThermal = true, int tTime = 50, bool bHydraulic = true, int hTime = 50, float c = 1.5f, bool enableTurb = false);
+	void update(float ratio, bool bThermal, int tTime, bool bHydraulic, int hTime);
 private:
 	Surf* surf;
 	Voronoi* vor;

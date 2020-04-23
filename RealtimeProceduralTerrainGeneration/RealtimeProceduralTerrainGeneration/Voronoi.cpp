@@ -17,7 +17,7 @@ Voronoi::Voronoi(int times, int rNum, float c1, float c2, float width) {
 	this->c1 = c1;
 	this->c2 = c2;
 	float w = width / 2.f;
-#pragma omp for
+
 	//generate random points
 	for (int i = 0; i < rNum; i++) {
 		vec3 r(random11()*w, 0.f, random11()*w);
@@ -25,7 +25,7 @@ Voronoi::Voronoi(int times, int rNum, float c1, float c2, float width) {
 	}
 	N = pow(2, times) + 1;
 	float offset = width / (N - 1);
-#pragma omp for
+
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			float x = j * offset - w;
@@ -43,5 +43,6 @@ Voronoi::Voronoi(int times, int rNum, float c1, float c2, float width) {
 
 Voronoi::~Voronoi()
 {
-	
+	v.clear();
+	rpoints.clear();
 }

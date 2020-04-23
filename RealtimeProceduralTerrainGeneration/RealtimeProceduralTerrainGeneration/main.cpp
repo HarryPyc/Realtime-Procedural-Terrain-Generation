@@ -43,17 +43,15 @@ float slider = 0.0f;
 bool recording = false;
 GLuint vao = -1;
 vec3 lightDir(-1, -1, -1);
-vec3 camPos(0.0f, 4.0f, 2.0f);
+vec3 camPos(7.0f, 10.0f, 7.0f);
 bool useLight = true;
 
 Terrain* terrain;
 float ratio = 0.667f;
-bool bThermal = true;
+bool bThermal = false;
 int thermalTime = 50;
-int hydraulicTime = 50;
-bool bHydraulic = true;
-float c = 2.0f;
-bool enableTurb = false;
+int hydraulicTime = 100;
+bool bHydraulic = false;
 //Draw the user interface using ImGui
 void draw_gui()
 {
@@ -87,7 +85,7 @@ void draw_gui()
    //create a slider to change the angle variables
    ImGui::SliderFloat("View angle", &slider, -3.141592f, +3.141592f);
    ImGui::SliderFloat3("LightDir", &lightDir[0],-1.0f, 1.0f);
-   ImGui::SliderFloat3("CameraPos", &camPos[0], -4.0f, 4.0f);
+   ImGui::SliderFloat3("CameraPos", &camPos[0], 0.0f, 15.0f);
    
    ImGui::SliderFloat("1/f Noise:Voronoi", &ratio, 0.0f, 1.0f);
    //ImGui::Checkbox("Enable Turbulence", &enableTurb);
@@ -116,12 +114,12 @@ void draw_gui()
    ImGui::Text(HtotalTimes.c_str());
    ImGui::Spacing();
    if (ImGui::Button("Generate Terrain")) {
-       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime, c, enableTurb);
+       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
        vao = create_terrain_vao(&terrain->v, terrain->N);
    }
    if (ImGui::Button("Generate New Terrain")) {
-       terrain->init();
-       terrain->update(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime, c, enableTurb);
+       delete terrain;
+       terrain = new Terrain(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
        vao = create_terrain_vao(&terrain->v, terrain->N);
    }
    ImGui::Checkbox("UseTexture", &useLight);
@@ -276,7 +274,7 @@ void initOpenGl()
    texRock2 = LoadTexture(texRock2_name.c_str());
    texSnow = LoadTexture(texSnow_name.c_str());
    texMud = LoadTexture(texMud_name.c_str());
-   terrain = new Terrain();
+   terrain = new Terrain(ratio, bThermal, thermalTime, bHydraulic, hydraulicTime);
    vao = create_terrain_vao(&terrain->v, terrain->N);
 
 }

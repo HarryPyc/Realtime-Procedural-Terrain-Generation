@@ -1,6 +1,6 @@
 #pragma once
 #include "Mathfunc.h"
-
+#include <omp.h>
 class Square;
 class Edge;
 class Point;
@@ -21,6 +21,7 @@ public:
 	Point *mid;
 	Edge *ne0, *ne1;//new edges after displacement
 	Edge(Point *a, Point *b);
+	~Edge();
 	void GetMidPoint(float spread);
 	void GenerateNewEdges();
 };
@@ -33,6 +34,7 @@ public:
 	Edge *ne0, *ne1, *ne2, *ne3;
 	Square *nf0, *nf1, *nf2, *nf3;
 	Square(Edge *e0, Edge *e1, Edge *e2, Edge *e3);
+	~Square();
 	void GetMidPoint(float spread);
 	void GenerateNewSquares();
 };
