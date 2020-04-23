@@ -9,8 +9,8 @@
 #define RESTART 99999
 
 const int iterationTimes = 10;
-const float width = 16.0f;
-const float initialSpread = 4.0f;
+const float width = 64.f;
+const float initialSpread = 32.0f;
 const int randomPointsNum = 20;
 
 

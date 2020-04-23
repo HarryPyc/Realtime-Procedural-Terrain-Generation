@@ -149,6 +149,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="FPSController.cpp" />
     <ClCompile Include="GenerateTerrain.cpp" />
     <ClCompile Include="HydraulicErosion.cpp" />
     <ClCompile Include="main.cpp" />
@@ -171,7 +173,9 @@
     <None Include="template_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="DebugCallback.h" />
+    <ClInclude Include="FPSController.h" />
     <ClInclude Include="GenerateTerrain.h" />
     <ClInclude Include="HydraulicErosion.h" />
     <ClInclude Include="imgui_impl_glut.h" />

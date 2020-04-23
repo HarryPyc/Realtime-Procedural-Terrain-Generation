@@ -20,6 +20,8 @@
 #include "VideoMux.h"
 #include "DebugCallback.h"
 #include "GenerateTerrain.h"
+#include "Camera.h"
+#include "FPSController.h"
 
 //names of the shader files to load
 static const std::string vertex_shader("template_vs.glsl");
@@ -40,52 +42,28 @@ GLuint texMud = -1;
 
 float time_sec = 0.0f;
 float slider = 0.0f;
-bool recording = false;
+
 GLuint vao = -1;
 vec3 lightDir(-1, -1, -1);
-vec3 camPos(7.0f, 10.0f, 7.0f);
+
 bool useLight = true;
+
+Camera* camera;
+FPSController* controller;
 
 Terrain* terrain;
 float ratio = 0.667f;
-bool bThermal = false;
-int thermalTime = 50;
-int hydraulicTime = 100;
-bool bHydraulic = false;
+bool bThermal = true;
+int thermalTime = 10;
+int hydraulicTime = 1000;
+bool bHydraulic = true;
 //Draw the user interface using ImGui
 void draw_gui()
 {
    ImGui_ImplGlut_NewFrame();
 
-   const int filename_len = 256;
-   static char video_filename[filename_len] = "capture.mp4";
-
-   ImGui::InputText("Video filename", video_filename, filename_len);
-   ImGui::SameLine();
-   if (recording == false)
-   {
-      if (ImGui::Button("Start Recording"))
-      {
-         const int w = glutGet(GLUT_WINDOW_WIDTH);
-         const int h = glutGet(GLUT_WINDOW_HEIGHT);
-         recording = true;
-         start_encoding(video_filename, w, h); //Uses ffmpeg
-      }
-      
-   }
-   else
-   {
-      if (ImGui::Button("Stop Recording"))
-      {
-         recording = false;
-         finish_encoding(); //Uses ffmpeg
-      }
-   }
-
    //create a slider to change the angle variables
-   ImGui::SliderFloat("View angle", &slider, -3.141592f, +3.141592f);
    ImGui::SliderFloat3("LightDir", &lightDir[0],-1.0f, 1.0f);
-   ImGui::SliderFloat3("CameraPos", &camPos[0], 0.0f, 15.0f);
    
    ImGui::SliderFloat("1/f Noise:Voronoi", &ratio, 0.0f, 1.0f);
    //ImGui::Checkbox("Enable Turbulence", &enableTurb);
@@ -102,7 +80,7 @@ void draw_gui()
    std::string totalTimes = "Total Times:" + std::to_string(terrain->Tcount);
    ImGui::Text(totalTimes.c_str());
    ImGui::Checkbox("Hydraulic Erosion", &bHydraulic);
-   ImGui::SliderInt("Hydraulic Times", &hydraulicTime, 0, 100);
+   ImGui::SliderInt("Hydraulic Times", &hydraulicTime, 0, 1000);
    if (ImGui::Button("GetHydraulicErosion")) {
        if (bHydraulic) {
            terrain->hydraulic(hydraulicTime);
@@ -123,6 +101,9 @@ void draw_gui()
        vao = create_terrain_vao(&terrain->v, terrain->N);
    }
    ImGui::Checkbox("UseTexture", &useLight);
+
+   ImGui::Text("use wasd and qe to move");
+   ImGui::Text("press m to release cursor");
    ImGui::Render();
  }
 
@@ -134,13 +115,8 @@ void display()
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    glUseProgram(shader_program);
 
-   const int w = glutGet(GLUT_WINDOW_WIDTH);
-   const int h = glutGet(GLUT_WINDOW_HEIGHT);
-   const float aspect_ratio = float(w) / float(h);
 
    glm::mat4 M = glm::rotate(slider, glm::vec3(0.0f, 1.0f, 0.0f));
-   glm::mat4 V = glm::lookAt(camPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-   glm::mat4 P = glm::perspective(radians(60.f), aspect_ratio, 0.1f, 100.0f);
 
    glActiveTexture(GL_TEXTURE0);
    glBindTexture(GL_TEXTURE_2D, texGrass);
@@ -182,12 +158,8 @@ void display()
    if (light_loc != -1) {
 	   glUniform3fv(light_loc, 1, &lightDir[0]);
    }
-   int PVM_loc = glGetUniformLocation(shader_program, "PVM");
-   if (PVM_loc != -1)
-   {
-      glm::mat4 PVM = P*V*M;
-      glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(PVM));
-   }
+   
+   camera->upload(shader_program);
    int M_loc = glGetUniformLocation(shader_program, "M");
    if (M_loc != -1)
    {
@@ -204,15 +176,7 @@ void display()
      DrawTerrain(vao, terrain->N);
          
    draw_gui();
-
-   if (recording == true)
-   {
-      glFinish();
-
-      glReadBuffer(GL_BACK);
-      read_frame_to_encode(&rgb, &pixels, w, h);
-      encode_frame(rgb);
-   }
+   controller->update();
 
    glutSwapBuffers();
 }
@@ -282,47 +246,37 @@ void initOpenGl()
 // glut callbacks need to send keyboard and mouse events to imgui
 void keyboard(unsigned char key, int x, int y)
 {
-   ImGui_ImplGlut_KeyCallback(key);
-   std::cout << "key : " << key << ", x: " << x << ", y: " << y << std::endl;
-
-   switch(key)
-   {
-      case 'r':
-      case 'R':
-         reload_shader();     
-      break;
-
-   }
+    controller->keyboard(key, x, y);
 }
 
 void keyboard_up(unsigned char key, int x, int y)
 {
-   ImGui_ImplGlut_KeyUpCallback(key);
+    controller->keyboard_up(key, x, y);
 }
 
 void special_up(int key, int x, int y)
 {
-   ImGui_ImplGlut_SpecialUpCallback(key);
+    controller->special_up(key, x, y);
 }
 
 void passive(int x, int y)
 {
-   ImGui_ImplGlut_PassiveMouseMotionCallback(x,y);
+    controller->passive(x, y);
 }
 
 void special(int key, int x, int y)
 {
-   ImGui_ImplGlut_SpecialCallback(key);
+    controller->special(key, x, y);
 }
 
 void motion(int x, int y)
 {
-   ImGui_ImplGlut_MouseMotionCallback(x, y);
+    controller->motion(x, y);
 }
 
 void mouse(int button, int state, int x, int y)
 {
-   ImGui_ImplGlut_MouseButtonCallback(button, state);
+    controller->mouse(button, state, x, y);
 }
 
 
@@ -349,12 +303,14 @@ int main (int argc, char **argv)
    glutSpecialUpFunc(special_up);
    glutMouseFunc(mouse);
    glutMotionFunc(motion);
-   glutPassiveMotionFunc(motion);
+   glutPassiveMotionFunc(passive);
 
    glutIdleFunc(idle);
 
    initOpenGl();
    ImGui_ImplGlut_Init(); // initialize the imgui system
+   camera = new Camera(glm::vec3(0,5,5));
+   controller = new FPSController(camera, 1280, 720);
 
    //Enter the glut event loop.
    glutMainLoop();

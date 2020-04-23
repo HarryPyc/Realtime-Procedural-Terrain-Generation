@@ -116,11 +116,12 @@ void Terrain::update(float ratio, bool bThermal, int tTime, bool bHydraulic, int
 	}
 	//if(enableTurb)
 	//	turb(c);
+	if (bHydraulic)
+		hydraulic(hTime);
 	if (bThermal) {
 		thermal(tTime);
 	}
-	if (bHydraulic)
-		hydraulic(hTime);
+
 }
 
 void Terrain::thermal(int time) {
