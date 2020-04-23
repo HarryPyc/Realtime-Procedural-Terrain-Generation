@@ -21,7 +21,7 @@ void iteration(vector<vec3> *v, int i, int j, int N) {
 	float d3 = h - h3;
 	float d4 = h - h4;
 
-	const float T = 4.f / float(N);
+	const float T = 1/64.f;
 	float dTotal = 0.f;
 	float dMax = glm::max(d1, glm::max(d2, glm::max(d3, d4)));
 	if (d1 > T) dTotal += d1;
@@ -39,7 +39,6 @@ void iteration(vector<vec3> *v, int i, int j, int N) {
 }
 void ThermalErosion(vector<vec3> *v, int N)
 {
-#pragma omp parallel for
 	for (int i = 1; i < N - 1; i++) {
 		for (int j = 1; j < N - 1; j++) {
 			iteration(v, i, j, N);

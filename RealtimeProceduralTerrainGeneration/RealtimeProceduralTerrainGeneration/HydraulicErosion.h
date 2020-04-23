@@ -2,10 +2,10 @@
 #include "Mathfunc.h"
 #include <omp.h>
 
-const float Ke = 0.001f;//evaporation rate
+const float Ke = 0.01f;//evaporation rate
 const float Ks = 0.1f;//dissolving rate
 const float Kc = 0.01f;
-const float dt = 1.2f; //time-step to control whole process
+const float dt = 0.5f; //time-step to control whole process
 const float density = 1.0f;  //increase this will make particle move faster
 
 const float minVol = 0.01f;

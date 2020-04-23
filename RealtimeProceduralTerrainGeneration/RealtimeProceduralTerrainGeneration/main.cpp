@@ -53,10 +53,10 @@ FPSController* controller;
 
 Terrain* terrain;
 float ratio = 0.667f;
-bool bThermal = true;
-int thermalTime = 10;
+bool bThermal = false;
+int thermalTime = 40;
 int hydraulicTime = 1000;
-bool bHydraulic = true;
+bool bHydraulic = false;
 //Draw the user interface using ImGui
 void draw_gui()
 {
@@ -88,7 +88,7 @@ void draw_gui()
        }
    }
    ImGui::SameLine();
-   std::string HtotalTimes = "Total Times:" + std::to_string(terrain->Hcount);
+   std::string HtotalTimes = "Particle Num:" + std::to_string(terrain->Hcount*1000);
    ImGui::Text(HtotalTimes.c_str());
    ImGui::Spacing();
    if (ImGui::Button("Generate Terrain")) {

@@ -3,7 +3,7 @@
 glm::mat4 Camera::getPerspectiveMatrix(int w, int h)
 {
 	float aspect_ratio = float(w) / float(h);
-	return glm::perspective(3.141592f / 4.f, aspect_ratio, 0.1f, 100.f);
+	return glm::perspective(3.141592f / 4.f, aspect_ratio, 0.1f, 200.f);
 }
 
 glm::mat4 Camera::getViewMatrix()
