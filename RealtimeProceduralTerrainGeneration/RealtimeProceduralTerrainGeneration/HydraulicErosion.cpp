@@ -40,7 +40,8 @@ void HydraulicErosion(vector<vec3>* v, int N, int times)
 
 			ivec2 _ipos = drop->pos;
 			//equilibrium concentration 
-			float maxSediment = drop->volume * length(drop->speed) * (v->at(ipos.x * N+ipos.y).y - v->at(_ipos.x * N + _ipos.y).y);
+			float maxSediment = drop->volume * length(drop->speed) * 
+				(v->at(ipos.x * N+ipos.y).y - v->at(_ipos.x * N + _ipos.y).y);
 			if (maxSediment < 0.0f) 
 				maxSediment = 0.0f;
 			//dissolving and deposition
