@@ -1,5 +1,6 @@
 #include "HydraulicErosion.h"
-
+#include <ctime>
+#include <iostream>
 
 struct Particle {
 	Particle(vec2 _pos) { 
@@ -21,7 +22,9 @@ vec3 GetNormal(vector<vec3>* v, int i, int j, int N) {
 }
 void HydraulicErosion(vector<vec3>* v, int N, int times)
 {
-#pragma omp parallel for
+	time_t start, finish;
+	time(&start);
+	#pragma omp parallel for
 	for (int i = 0; i < times*1000; i++) {
 		Particle *drop = new Particle(vec2(rand() % N, rand() % N));
 
@@ -53,5 +56,7 @@ void HydraulicErosion(vector<vec3>* v, int N, int times)
 		}
 		delete drop;
 	}
+	time(&finish);
+	cout << "Time Used : " << difftime(finish,start) << " seconds" << endl;
 	
 }

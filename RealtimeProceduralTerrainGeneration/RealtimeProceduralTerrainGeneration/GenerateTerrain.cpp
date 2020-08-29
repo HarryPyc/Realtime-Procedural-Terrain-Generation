@@ -93,8 +93,7 @@ void Terrain::init() {
 	//get Voronoi map and noise map
 	vor = new Voronoi(iterationTimes, randomPointsNum, -1.0f, 1.0f, width);
 	surf = new Surf(width, initialSpread);
-	for (int i = 0; i < iterationTimes; i++)
-		surf = surf->MidpointDisplacement();
+	surf = MidpointDisplacement(surf, iterationTimes);
 	N = vor->N;
 	//The map we get from midpoint displacement is disordered
 	for (int i = 0; i < N * N; i++)

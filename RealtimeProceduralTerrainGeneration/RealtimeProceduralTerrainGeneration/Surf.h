@@ -52,9 +52,10 @@ public:
 	~Surf();
 
 	float spread;
-	Surf* MidpointDisplacement();
+	void init(float w, float spread);
+
 	void CalculateNormal();
 };
 
-
+Surf* MidpointDisplacement(Surf* origin, int times);
 inline vec3 offset(float spread);
